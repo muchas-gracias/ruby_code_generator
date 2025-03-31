@@ -11,9 +11,13 @@ def parse_arguments
 
   OptionParser.new do |opts|
     opts.banner = "Usage: your_script.rb [options]"
-
-    opts.on("-cFILE", "--config=FILE", "Specify a config file") do |file|
-      options[:config] = file
+    
+    opts.on("-cCOUNT", "--count=COUNT", Integer, "Specify a count (must be an integer between 1 and 5000)") do |count|
+      if count < 1 || count > 5000
+        puts "Error: Count must be between 1 and 5000!"
+        exit 1
+      end
+      options[:count] = count
     end
 
     opts.on("-v", "--verbose", "Enable verbose mode") do
@@ -21,7 +25,12 @@ def parse_arguments
     end
 
     opts.on("-h", "--help", "Prints this help") do
-      puts opts
+      puts <<~HELP
+        This script allows you to perform various operations with configurable options.
+        You can specify a config file using the -c or --count option, and enable verbose
+        mode with the -v or --verbose option. Use -h or --help to display this message.
+        The user is required to add a count (integer) ranging from 1 - 5000.
+      HELP
       exit
     end
   end.parse!
