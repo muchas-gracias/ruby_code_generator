@@ -1,5 +1,12 @@
 require 'optarse'
 
+
+def random_character
+  return rand(97..122)
+
+def random_number
+    return rand(1..9)
+  
 def main
   puts 'in main'
 
@@ -9,15 +16,14 @@ end
 def parse_arguments
   options = {}
 
-  OptionParser.new do |opts|
+  parser = OptionParser.new do |opts|
     opts.banner = "Usage: your_script.rb [options]"
     
-    opts.on("-cCOUNT", "--count=COUNT", Integer, "Specify a count (must be an integer between 1 and 5000)") do |count|
-      if count < 1 || count > 5000
-        puts "Error: Count must be between 1 and 5000!"
-        exit 1
+    opts.on("-c COUNT Integer, "Specify a count (must be an integer between 1 and 5000)") do |value|
+      unless value.between?(1, 5000)
+        raise ArgumentError, "Value must be between 1, and 5000"
       end
-      options[:count] = count
+      options[:count] = value
     end
 
     opts.on("-v", "--verbose", "Enable verbose mode") do
