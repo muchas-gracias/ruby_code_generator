@@ -1,15 +1,57 @@
-require 'optarse'
+require 'optparse'
 
+class Code
+  def initialize(count, letters, integers)
+    @count = count
+    @letters = letters
+    @integers = integers
+    @len = integers + letters
+    @temp = []
+    @code = []
+  end
 
-def random_character
-  return rand(97..122)
+  def random_character
+    return rand(97..122)
+  end
 
-def random_number
+  def random_number
     return rand(1..9)
-  
-def main
-  puts 'in main'
+  end
 
+  def parse
+    # stopped
+
+
+  end
+
+  def main
+    idx = 0
+    cnt = 0
+
+
+    while cnt < @count
+      while idx < @letters
+        value = self.random_character
+        @temp << value.chr
+        idx += 1
+      end
+
+      idx = 0
+      while idx < @integers
+        value = self.random_number
+        @temp << value
+        idx += 1
+      end
+
+      self.parse
+      print @temp
+      @temp.clear
+
+      cnt += 1
+    end
+
+
+  end
 
 end
 
@@ -17,13 +59,27 @@ def parse_arguments
   options = {}
 
   parser = OptionParser.new do |opts|
-    opts.banner = "Usage: your_script.rb [options]"
-    
-    opts.on("-c COUNT Integer, "Specify a count (must be an integer between 1 and 5000)") do |value|
-      unless value.between?(1, 5000)
-        raise ArgumentError, "Value must be between 1, and 5000"
+    opts.banner = "Usage: main.rb [-c -i -l]"
+
+    opts.on("-c COUNT", Integer, "Specify a count (integer between 1 and 5000)") do |value|
+      if value < 1 || value > 5000
+        raise ArgumentError, "Count must be between 1 and 5000"
       end
       options[:count] = value
+    end
+
+    opts.on("-l LETTER", Integer, "Specify a letter amount (integer between 1 and 9)") do |value|
+      if value < 1 || value > 9
+        raise ArgumentError, "Letter count must be between 1 and 9"
+      end
+      options[:letter] = value
+    end
+
+    opts.on("-i Integer", Integer, "Specify an integer amount (integer between 1 and 9)") do |value|
+      if value < 1 || value > 9
+        raise ArgumentError, "Integer count must be between 1 and 9"
+      end
+      options[:integer] = value
     end
 
     opts.on("-v", "--verbose", "Enable verbose mode") do
@@ -33,16 +89,34 @@ def parse_arguments
     opts.on("-h", "--help", "Prints this help") do
       puts <<~HELP
         This script allows you to perform various operations with configurable options.
-        You can specify a config file using the -c or --count option, and enable verbose
-        mode with the -v or --verbose option. Use -h or --help to display this message.
-        The user is required to add a count (integer) ranging from 1 - 5000.
+        You can specify a count (integer between 1 and 5000) with -c, level (integer between 1 and 9) with -l,
+        intensity (integer between 1 and 9) with -i, and enable verbose mode with -v. Use -h or --help to display this message.
       HELP
       exit
     end
-  end.parse!
+  end
+
+  begin
+    parser.parse!
+  rescue OptionParser::InvalidOption, OptionParser::MissingArgument => e
+    puts e.message
+    puts parser.help
+    exit 1
+  rescue ArgumentError => e
+    puts "Error: #{e.message}"
+    exit 1
+  end
+
+  if options[:count].nil? || options[:letter].nil? || options[:integer].nil?
+    puts "Error: -c (count), -l (letter), and -i (integer) are required."
+    exit 1
+  end
 
   options
 end
+
 if __FILE__ == $0
   options = parse_arguments
-  main(options)
+  get_codes = Code.new(options[:count], options[:letter], options[:integer])
+  get_codes.main
+end
