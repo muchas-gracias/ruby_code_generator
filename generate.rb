@@ -10,7 +10,7 @@
 # @Std       Ruby 3.0
 #
 # @example
-#   ruby generate.rb -c 20 -l 10 -i 5
+#   ruby generate.rb -c 20 -l 9 -i 5
 #
 # This script utilizes the optparse module in Ruby for command-line argument
 # parsing.  The script generates a specific amount of fixed length codes,
@@ -24,7 +24,7 @@
 #
 # == Usage:
 # To run this script, use the following command:
-#   ruby generate.rb -c <# of codes> -l <# of letters> -i <# of integers>
+# ruby generate.rb -c <# of codes> -l <# of characters> -i <# of integers>
 #
 ##------------------------------------------------------------------------------
 
@@ -34,13 +34,13 @@ MAX_ITERATION = 1000
 
 # Class for initializing, creating, and parsing fixed length codes.
 class Code
-  def initialize(count, letters, integers)
+  def initialize(count, characters, integers)
     @count = count
-    @letters = letters
+    @characters = characters
     @integers = integers
     @temp = []
-    @code = []
     @duplicate = 0
+    @hash = {}
   end
 
   # Produces a random integer between a a min and max integer.
@@ -55,7 +55,7 @@ class Code
     return rand(min_int..max_int)
   end
 
-    # Parses the generated codes, electing random indexes to rearrange.
+  # Parses the generated codes, electing random indexes to rearrange.
   #
   # == Parameters:
   # None
@@ -74,7 +74,8 @@ class Code
     return code.map(&:to_s).join
 
   end
-    # Entry point to the class.  Gathers the correct amount of characters and integers.
+
+  # Entry point to the class.  Gathers the correct amount of characters and integers.
   #
   # == Parameters:
   # None
@@ -89,7 +90,7 @@ class Code
 
     while cnt < @count
       break @code.clear if @duplicate == MAX_ITERATION
-      while idx < @letters
+      while idx < @characters
         value = self.random_number(97, 122)
         @temp << value.chr
         idx += 1
@@ -104,58 +105,67 @@ class Code
 
       rearranged_code = self.parse
 
-      if @code.include?(rearranged_code)
+      key = rearranged_code[0, 2]
+
+      if @hash.key?(key) && @hash[key].include?(rearranged_code)
         @duplicate += 1
         next
       end
+      
+      @hash[key] ||= []
+      @hash[key] << rearranged_code
 
-      @code << rearranged_code
+      # clearing the list for re-use
       @temp.clear
 
       cnt += 1
       idx = 0
     end
 
+    # if the same codes continuously appear at the amount of the variable MAX_ITERATION
     if @duplicate == MAX_ITERATION
       puts "The number of unique codes is limited due to a fixed set of possible combinations"
     else
-      puts "Generated Codes\n\n#{@code.join("\n")}"
+      # outputting the generated codes
+      puts "Generated Codes\n\n"
+      @hash.values.each do |value|
+        puts value
+      end
     end
-
   end
 
 end
 
-  # Parses CLI arguments.
-  #
-  # == Parameters:
-  # None
-  #
-  # == Returns:
-  # Options (CLI Arguments)
+# Parses CLI arguments.
+#
+# == Parameters:
+# None
+#
+# == Returns:
+# Options (CLI Arguments)
 def parse_arguments
   options = {}
 
   parser = OptionParser.new do |opts|
     opts.banner = "Usage: main.rb [-c -i -l]"
 
-    opts.on("-c COUNT", Integer, "Integer between 1 and 5000") do |value|
-      if value < 1 || value > 5000
-        raise ArgumentError, "Count must be between 1 and 5000"
+    opts.on("-c COUNT", Integer, "Integer between 1 and 1000000") do |value|
+      if value < 1 || value > 1000000
+        raise ArgumentError, "Count must be between 1 and 1000000"
       end
       options[:count] = value
     end
 
-    opts.on("-l LETTER", Integer, "Integer between 1 and 9") do |value|
-      if value < 1 || value > 9
-        raise ArgumentError, "Letter count must be between 1 and 9"
+    opts.on("-l CHARACTERS", Integer, "Integer between 1 and 20") do |value|
+      if value < 1 || value > 20
+        raise ArgumentError, "Character count must be between 1 and 20"
       end
       options[:letter] = value
     end
 
-    opts.on("-i Integer", Integer, "Integer between 1 and 9") do |value|
-      if value < 1 || value > 9
-        raise ArgumentError, "Integer count must be between 1 and 9"
+    opts.on("-i INTEGERS", Integer, "Integer between 1 and 20") do |value|
+      if value < 1 || value > 20
+        raise ArgumentError, "Integer count must be between 1 and 20"
       end
       options[:integer] = value
     end
@@ -167,9 +177,9 @@ def parse_arguments
     opts.on("-h", "--help", "Help Information") do
       puts <<~HELP
         This script allows you to perform various operations with configurable
-        options. You can specify a count (integer between 1 and 5000) with -c,
-        level (integer between 1 and 9) with -l, intensity (integer between 1
-        and 9) with -i, and enable verbose mode with -v. Use -h or --help to
+        options. You can specify a count/amount (integer between 1 and 1,000,000) with -c,
+        character count (integer between 1 and 20) with -l, and an integer character (integer between 1
+        and 20) with -i, and enable verbose mode with -v. Use -h or --help to
         display this message.
       HELP
       exit
@@ -188,7 +198,7 @@ def parse_arguments
   end
 
   if options[:count].nil? || options[:letter].nil? || options[:integer].nil?
-    puts "Error: -c (count), -l (letter), and -i (integer) are required."
+    puts "Error: -c (count), -l (characters), and -i (integers) are required."
     exit 1
   end
 
