@@ -3,11 +3,6 @@ This program generates customizable codes with user-defines length.  It allows u
 
 
 
-
-
-
-
-
 <!-- PROJECT LOGO -->
 <br />
 
@@ -78,11 +73,11 @@ To run this program, perform the following:
 
 ruby generate.rb -c <# of codes> -l <# of letters> -i <# of integers>
 
--c is the number of codes to be produced
+-c is the number of codes to be produced NOT EXCEEDING 1,000,000
 
--l is the number of characters in each code
+-l is the number of characters in each code NOT EXCEEDING 20
 
--i is the number of integers in each code
+-i is the number of integers in each code NOT EXCEEDING 20
 
 
 <p align="right">(<a href="#readme-top">back to top</a>)</p>
