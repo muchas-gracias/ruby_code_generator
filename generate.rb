@@ -3,7 +3,7 @@
 
 ################################################################################
 # @file      generate.rb
-# @author    Greg nelson
+# @author    Greg Nelson
 # @Copyright Copyright 2025 by Greg Nelson.  All rights reserved.
 # @brief     Code generator using optparse in Ruby
 # @Keywords  ruby code generator
@@ -24,13 +24,13 @@
 #
 # == Usage:
 # To run this script, use the following command:
-#   ruby argParse.rb --name <your_name> --age <your_age>
+#   ruby generate.rb -c <# of codes> -l <# of letters> -i <# of integers>
 #
 ##------------------------------------------------------------------------------
 
-
 require 'optparse'
 
+# Class for initializing, creating, and parsing fixed length codes.
 class Code
   def initialize(count, letters, integers)
     @count = count
@@ -40,27 +40,31 @@ class Code
     @code = []
   end
 
-  def random_character
-    return rand(97..122)
-  end
-
+  # Produces a random integer between a a min and max integer.
+  #
+  # == Parameters:
+  # min_int:: Minimum Number (Integer)
+  # max_int:: Maximum Number (Integer)
+  #
+  # == Returns:
+  # Random Number
   def random_number(min_int, max_int)
     return rand(min_int..max_int)
   end
 
   def parse
-    cnt = 0
-    code = []
+    # cnt = 0
+    # code = []
 
-    while cnt != @temp.length
-      idx = self.random_number(0, (@temp.length) - 1)
-      puts idx
-      value = @temp.delete_at(idx)
-      # code << value
+    # while cnt != @temp.length
+    #   idx = self.random_number(0, (@temp.length) - 1)
+    #   puts idx
+    #   value = @temp.delete_at(idx)
+    #   # code << value
 
-      cnt += 1
-    end
-    # puts code
+    #   cnt += 1
+    # end
+    # # puts code
 
 
   end
@@ -73,7 +77,7 @@ class Code
 
     while cnt < @count
       while idx < @letters
-        value = self.random_character
+        value = self.random_integer(97, 122)
         @temp << value.chr
         idx += 1
       end
@@ -93,7 +97,6 @@ class Code
       idx = 0
     end
 
-
   end
 
 end
@@ -104,21 +107,21 @@ def parse_arguments
   parser = OptionParser.new do |opts|
     opts.banner = "Usage: main.rb [-c -i -l]"
 
-    opts.on("-c COUNT", Integer, "Specify a count (integer between 1 and 5000)") do |value|
+    opts.on("-c COUNT", Integer, "Integer between 1 and 5000") do |value|
       if value < 1 || value > 5000
         raise ArgumentError, "Count must be between 1 and 5000"
       end
       options[:count] = value
     end
 
-    opts.on("-l LETTER", Integer, "Specify a letter amount (integer between 1 and 9)") do |value|
+    opts.on("-l LETTER", Integer, "Integer between 1 and 9") do |value|
       if value < 1 || value > 9
         raise ArgumentError, "Letter count must be between 1 and 9"
       end
       options[:letter] = value
     end
 
-    opts.on("-i Integer", Integer, "Specify an integer amount (integer between 1 and 9)") do |value|
+    opts.on("-i Integer", Integer, "Integer between 1 and 9") do |value|
       if value < 1 || value > 9
         raise ArgumentError, "Integer count must be between 1 and 9"
       end
@@ -129,11 +132,13 @@ def parse_arguments
       options[:verbose] = true
     end
 
-    opts.on("-h", "--help", "Prints this help") do
+    opts.on("-h", "--help", "Help Information") do
       puts <<~HELP
-        This script allows you to perform various operations with configurable options.
-        You can specify a count (integer between 1 and 5000) with -c, level (integer between 1 and 9) with -l,
-        intensity (integer between 1 and 9) with -i, and enable verbose mode with -v. Use -h or --help to display this message.
+        This script allows you to perform various operations with configurable
+        options. You can specify a count (integer between 1 and 5000) with -c,
+        level (integer between 1 and 9) with -l, intensity (integer between 1
+        and 9) with -i, and enable verbose mode with -v. Use -h or --help to
+        display this message.
       HELP
       exit
     end
