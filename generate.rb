@@ -30,6 +30,8 @@
 
 require 'optparse'
 
+MAX_ITERATION = 1000
+
 # Class for initializing, creating, and parsing fixed length codes.
 class Code
   def initialize(count, letters, integers)
@@ -38,6 +40,7 @@ class Code
     @integers = integers
     @temp = []
     @code = []
+    @duplicate = 0
   end
 
   # Produces a random integer between a a min and max integer.
@@ -52,23 +55,32 @@ class Code
     return rand(min_int..max_int)
   end
 
+    # Parses the generated codes, electing random indexes to rearrange.
+  #
+  # == Parameters:
+  # None
+  #
+  # == Returns:
+  # String (code)
   def parse
-    # cnt = 0
-    # code = []
+    code = []
 
-    # while cnt != @temp.length
-    #   idx = self.random_number(0, (@temp.length) - 1)
-    #   puts idx
-    #   value = @temp.delete_at(idx)
-    #   # code << value
+    while @temp.length > 0
+      idx = self.random_number(0, (@temp.length) - 1)
+      value = @temp.delete_at(idx).to_s
+      code << value
+    end
 
-    #   cnt += 1
-    # end
-    # # puts code
-
+    return code.map(&:to_s).join
 
   end
-
+    # Entry point to the class.  Gathers the correct amount of characters and integers.
+  #
+  # == Parameters:
+  # None
+  #
+  # == Returns:
+  # None
   def main
     idx = 0
     cnt = 0
@@ -76,8 +88,9 @@ class Code
     max_int = 9
 
     while cnt < @count
+      break @code.clear if @duplicate == MAX_ITERATION
       while idx < @letters
-        value = self.random_integer(97, 122)
+        value = self.random_number(97, 122)
         @temp << value.chr
         idx += 1
       end
@@ -89,18 +102,37 @@ class Code
         idx += 1
       end
 
-      self.parse
-      # print @temp
+      rearranged_code = self.parse
+
+      if @code.include?(rearranged_code)
+        @duplicate += 1
+        next
+      end
+
+      @code << rearranged_code
       @temp.clear
 
       cnt += 1
       idx = 0
     end
 
+    if @duplicate == MAX_ITERATION
+      puts "The number of unique codes is limited due to a fixed set of possible combinations"
+    else
+      puts "Generated Codes\n\n#{@code.join("\n")}"
+    end
+
   end
 
 end
 
+  # Parses CLI arguments.
+  #
+  # == Parameters:
+  # None
+  #
+  # == Returns:
+  # Options (CLI Arguments)
 def parse_arguments
   options = {}
 
